@@ -36,8 +36,8 @@ export default function LazyTable({ route, columns, defaultPageSize, rowsPerPage
     // when handling events such as changing a selection box or typing into a text box,
     // the handler is called with parameter e (the event) and the value is e.target.value
     const newPageSize = e.target.value;
-
     setPageSize(newPageSize);
+    setPage(1);
   }
 
   const defaultRenderCell = (col, row) => {

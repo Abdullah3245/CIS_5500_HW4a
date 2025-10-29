@@ -31,7 +31,7 @@ export default function HomePage() {
     // fetching author name with error checking 
     fetch(`http://${config.server_host}:${config.server_port}/author/name`)
       .then(res => res.json())
-      .then(data => setAuthor(data))
+      .then(data => setAuthor(data.data))
       .catch((err) => console.log(err));
   }, []);
 
@@ -85,7 +85,7 @@ export default function HomePage() {
         defaultPageSize={7}
         rowsPerPageOptions={[5, 10]}
       />
-      <p>Created by {author.data}</p>
+      <p>Created by {author}</p>
     </Container>
   );
 };

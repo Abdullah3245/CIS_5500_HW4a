@@ -140,9 +140,6 @@ export default function SongsPage() {
             valueLabelFormat={value => <div>{value / 1000000}</div>}
           />
         </Grid>
-        {/* TODO (TASK 25): add sliders for danceability, energy, and valence (they should be all in the same row of the Grid) */}
-        {/* Hint: consider what value xs should be to make them fit on the same row. Set max, min, and a reasonable step. Is valueLabelFormat is necessary? */}
-        {/* Sliders row — Task 25 */}
         <Grid item xs={4}>
           <p>Danceability</p>
           <Slider

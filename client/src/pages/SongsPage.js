@@ -18,6 +18,7 @@ export default function SongsPage() {
   const [energy, setEnergy] = useState([0, 1]);
   const [valence, setValence] = useState([0, 1]);
   const [explicit, setExplicit] = useState(false);
+  const [suprise, setSuprise] = useState(false);
 
   useEffect(() => {
     fetch(`http://${config.server_host}:${config.server_port}/search_songs`)
@@ -27,6 +28,13 @@ export default function SongsPage() {
         setData(songsWithId);
       });
   }, []);
+
+  useEffect(() => {
+    if (suprise) {
+      search();
+      setSuprise(false);
+    }
+  }, [suprise])
 
   const search = () => {
     fetch(`http://${config.server_host}:${config.server_port}/search_songs?title=${title}` +
@@ -43,19 +51,40 @@ export default function SongsPage() {
         // To accomplish this, we use a map with spread syntax (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax)
         const songsWithId = resJson.map((song) => ({ id: song.song_id, ...song }));
         setData(songsWithId);
-      });
-      // TODO (TASK 27): handle errors that could happen in the backend api call, and alert the user accordingly
-      // Hint: What is the equivalent of try/catch when using promises?
+      }).catch((err) => {
+        window.alert("Failed to fetch results due to: ", err);
+      })
   }
+
+  const surpriseSearch = () => {
+    const randomRange = () => {
+      const high = Math.random(); 
+      const low = Math.random() * high;
+      return [parseFloat(low.toFixed(2)), parseFloat(high.toFixed(2))];
+    };
+
+    const randomDanceability = randomRange();
+    const randomEnergy = randomRange();
+    const randomValence = randomRange();
+
+    setDanceability(randomDanceability);
+    setEnergy(randomEnergy);
+    setValence(randomValence);
+    setSuprise(true);
+
+  };
+
 
   // This defines the columns of the table of songs used by the DataGrid component.
   // The format of the columns array and the DataGrid component itself is very similar to our
   // LazyTable component. The big difference is we provide all data to the DataGrid component
   // instead of loading only the data we need (which is necessary in order to be able to sort by column)
   const columns = [
-    { field: 'title', headerName: 'Title', width: 300, renderCell: (params) => (
+    {
+      field: 'title', headerName: 'Title', width: 300, renderCell: (params) => (
         <Link onClick={() => setSelectedSongId(params.row.song_id)}>{params.value}</Link>
-    ) },
+      )
+    },
     { field: 'duration', headerName: 'Duration' },
     { field: 'plays', headerName: 'Plays' },
     { field: 'danceability', headerName: 'Danceability' },
@@ -79,7 +108,7 @@ export default function SongsPage() {
       <h2>Search Songs</h2>
       <Grid container spacing={6}>
         <Grid item xs={8}>
-          <TextField label='Title' value={title} onChange={(e) => setTitle(e.target.value)} style={{ width: "100%" }}/>
+          <TextField label='Title' value={title} onChange={(e) => setTitle(e.target.value)} style={{ width: "100%" }} />
         </Grid>
         <Grid item xs={4}>
           <FormControlLabel
@@ -98,7 +127,7 @@ export default function SongsPage() {
             valueLabelDisplay='auto'
             valueLabelFormat={value => <div>{formatDuration(value)}</div>}
           />
-        </Grid>
+        </Grid> <br />
         <Grid item xs={6}>
           <p>Plays (millions)</p>
           <Slider
@@ -113,12 +142,53 @@ export default function SongsPage() {
         </Grid>
         {/* TODO (TASK 25): add sliders for danceability, energy, and valence (they should be all in the same row of the Grid) */}
         {/* Hint: consider what value xs should be to make them fit on the same row. Set max, min, and a reasonable step. Is valueLabelFormat is necessary? */}
+        {/* Sliders row — Task 25 */}
+        <Grid item xs={4}>
+          <p>Danceability</p>
+          <Slider
+            value={danceability}
+            min={0}
+            max={1}
+            valueLabelDisplay='auto'
+            step={0.1}
+            onChange={(e, newValue) => setDanceability(newValue)}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <p>Energy</p>
+          <Slider
+            value={energy}
+            min={0}
+            max={1}
+            valueLabelDisplay='auto'
+            step={0.1}
+            onChange={(e, newValue) => setEnergy(newValue)}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <p>Valence</p>
+          <Slider
+            value={valence}
+            min={0}
+            max={1}
+            valueLabelDisplay='auto'
+            step={0.1}
+            onChange={(e, newValue) => setValence(newValue)}
+          />
+        </Grid>
+
       </Grid>
-      <Button onClick={() => search() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
-        Search
-      </Button>
-      {/* TODO (TASK 26): add a "surprise me" button that randomly selects filters for energy, valence, and danceability and searches for it */}
-      {/* Hint: Math.random() is your friend */}
+      <Grid container justifyContent="space-evenly">
+        <Grid item><Button variant="contained" onClick={() => search()} style={{ left: '50%', transform: 'translateX(-50%)' }}>
+          Search
+        </Button>
+        </Grid>
+        <Grid item>
+          <Button variant="contained" onClick={() => surpriseSearch()}>Surpise me</Button>
+        </Grid>
+      </Grid>
       <h2>Results</h2>
       {/* Notice how similar the DataGrid component is to our LazyTable! What are the differences? */}
       <DataGrid

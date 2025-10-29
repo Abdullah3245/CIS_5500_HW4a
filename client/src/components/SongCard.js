@@ -16,20 +16,23 @@ export default function SongCard({ songId, handleClose }) {
 
   const [barRadar, setBarRadar] = useState(true);
 
-  // TODO (TASK 21): fetch the song specified in songId and based on the fetched album_id also fetch the album data
-  // Hint: you need to both fill in the callback and the dependency array (what variable determines the information you need to fetch?)
-  // Hint: since the second fetch depends on the information from the first, try nesting the second fetch within the then block of the first (pseudocode is provided)
+  // 1. Fetch song data
   useEffect(() => {
-    // Hint: here is some pseudocode to guide you
-    // fetch(song data, id determined by songId prop)
-    //   .then(res => res.json())
-    //   .then(resJson => {
-    //     set state variable with song dta
-    //     fetch(album data, id determined by result in resJson)
-    //       .then(res => res.json())
-    //       .then(resJson => set state variable with album data)
-    //     })
-  }, []);
+    fetch(`http://${config.server_host}:${config.server_port}/song/${songId}`)
+      .then(res => res.json())
+      .then(data => setSongData(data))
+      .catch(err => console.log(err));
+  }, [songId]);
+
+  // 2. Once songData is fetched, fetch the album
+  useEffect(() => {
+    if (songData?.album_id) {
+      fetch(`http://${config.server_host}:${config.server_port}/album/${songData.album_id}`)
+        .then(res => res.json())
+        .then(data => setAlbumData(data))
+        .catch(err => console.log(err));
+    }
+  }, [songData]);
 
   const chartData = [
     { name: 'Danceability', value: songData.danceability },
@@ -79,10 +82,23 @@ export default function SongCard({ songId, handleClose }) {
                 </ResponsiveContainer>
               ) : (
                 <ResponsiveContainer height={250}>
-                  {/* TODO (TASK 22): display the same data as the bar chart using a radar chart */}
-                  {/* Hint: refer to documentation at https://recharts.org/en-US/api/RadarChart */}
-                  {/* Hint: note you can omit the <Legend /> element and only need one Radar element, as compared to the sample in the docs */}
-                  <div>Replace Me</div>
+                  <RadarChart
+                    style={{ width: '100%', height: '100%', maxWidth: '500px', maxHeight: '80vh', aspectRatio: 1 }}
+                    outerRadius="80%"
+                    data={chartData}
+                    margin={{ left: 40 }}
+                  >
+                    <PolarGrid />
+                    <PolarAngleAxis dataKey="name" />
+                    <PolarRadiusAxis />
+                    <Radar
+                      name="Attributes"
+                      dataKey="value"
+                      stroke="#8884d8"
+                      fill="#8884d8"
+                      fillOpacity={0.6}
+                    />
+                  </RadarChart>
                 </ResponsiveContainer>
               )
           }

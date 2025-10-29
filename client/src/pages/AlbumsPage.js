@@ -22,9 +22,7 @@ export default function AlbumsPage() {
   const format4 = { display: 'grid', justifyContent: 'space-evenly' };
 
   return (
-    // TODO (TASK 23): Try out the different provided formatting options by replacing “format1”  in the Container's style property with the other provided options.
-    // TODO (TASK 23): Choose the one that displays all the albums in a fluid grid.
-    <Container style={format1}>
+    <Container style={format3}>
       {albums.map((album) =>
         <Box
           key={album.album_id}

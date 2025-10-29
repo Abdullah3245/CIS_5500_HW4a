@@ -52,7 +52,7 @@ export default function SongsPage() {
         const songsWithId = resJson.map((song) => ({ id: song.song_id, ...song }));
         setData(songsWithId);
       }).catch((err) => {
-        window.alert("Failed to fetch results due to: ", err);
+        alert("Failed to fetch results due to: ", err);
       })
   }
 
